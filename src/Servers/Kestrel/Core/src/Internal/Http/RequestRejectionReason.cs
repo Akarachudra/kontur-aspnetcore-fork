@@ -3,7 +3,7 @@
 
 namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http
 {
-    internal enum RequestRejectionReason
+    public enum RequestRejectionReason
     {
         UnrecognizedHTTPVersion,
         InvalidRequestLine,
