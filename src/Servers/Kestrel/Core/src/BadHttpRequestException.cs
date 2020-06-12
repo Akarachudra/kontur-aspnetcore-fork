@@ -33,7 +33,9 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core
 
         internal StringValues AllowedHeader { get; }
 
-        internal RequestRejectionReason Reason { get; }
+#pragma warning disable PUB0001 // Pubternal type in public API
+        public RequestRejectionReason Reason { get; }
+#pragma warning restore PUB0001 // Pubternal type in public API
 
         [StackTraceHidden]
         internal static void Throw(RequestRejectionReason reason)
