@@ -363,7 +363,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http
                 {
                     // The previous string does not match what the bytes would convert to,
                     // so we will need to generate a new string.
-                    RawTarget = _parsedRawTarget = target.GetAsciiStringNonNullCharacters();
+                    RawTarget = _parsedRawTarget = target.GetAsciiOrUTF8StringNonNullCharacters();
 
                     previousValue = _parsedQueryString;
                     if (disableStringReuse ||
@@ -372,7 +372,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http
                     {
                         // The previous string does not match what the bytes would convert to,
                         // so we will need to generate a new string.
-                        QueryString = _parsedQueryString = query.GetAsciiStringNonNullCharacters();
+                        QueryString = _parsedQueryString = query.GetAsciiOrUTF8StringNonNullCharacters();
                     }
                     else
                     {
@@ -443,7 +443,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http
             {
                 // The previous string does not match what the bytes would convert to,
                 // so we will need to generate a new string.
-                RawTarget = _parsedRawTarget = target.GetAsciiStringNonNullCharacters();
+                RawTarget = _parsedRawTarget = target.GetAsciiOrUTF8StringNonNullCharacters();
             }
             else
             {
@@ -500,7 +500,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http
             {
                 // The previous string does not match what the bytes would convert to,
                 // so we will need to generate a new string.
-                RawTarget = _parsedRawTarget = target.GetAsciiStringNonNullCharacters();
+                RawTarget = _parsedRawTarget = target.GetAsciiOrUTF8StringNonNullCharacters();
 
                 // Validation of absolute URIs is slow, but clients
                 // should not be sending this form anyways, so perf optimization
@@ -521,7 +521,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http
                 {
                     // The previous string does not match what the bytes would convert to,
                     // so we will need to generate a new string.
-                    QueryString = _parsedQueryString = query.GetAsciiStringNonNullCharacters();
+                    QueryString = _parsedQueryString = query.GetAsciiOrUTF8StringNonNullCharacters();
                 }
                 else
                 {

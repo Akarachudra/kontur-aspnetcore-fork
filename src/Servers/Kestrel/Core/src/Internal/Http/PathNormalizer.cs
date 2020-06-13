@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http
                 return rawTarget;
             }
 
-            return path.Slice(0, pathLength).GetAsciiStringNonNullCharacters();
+            return path.Slice(0, pathLength).GetAsciiOrUTF8StringNonNullCharacters();
         }
 
         // In-place implementation of the algorithm from https://tools.ietf.org/html/rfc3986#section-5.2.4

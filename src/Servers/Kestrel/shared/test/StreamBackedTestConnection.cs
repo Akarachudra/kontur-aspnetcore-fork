@@ -90,6 +90,30 @@ namespace Microsoft.AspNetCore.Testing
             await _stream.FlushAsync().ConfigureAwait(false);
         }
 
+        public async Task SendWithUtf8(params string[] lines)
+        {
+            var text = string.Join("\r\n", lines);
+            var utf8Bytes = Encoding.UTF8.GetBytes(text);
+            var utf8StringBuilder = new StringBuilder(utf8Bytes.Length);
+            foreach (var c in utf8Bytes)
+            {
+                utf8StringBuilder.Append((char)c);
+            }
+
+            var utf8String = utf8StringBuilder.ToString();
+            var writer = new StreamWriter(_stream, Encoding.GetEncoding("iso-8859-1"));
+            for (var index = 0; index < utf8String.Length; index++)
+            {
+                var ch = utf8String[index];
+                writer.Write(ch);
+                await writer.FlushAsync().ConfigureAwait(false);
+                // Re-add delay to help find socket input consumption bugs more consistently
+                //await Task.Delay(TimeSpan.FromMilliseconds(5));
+            }
+            await writer.FlushAsync().ConfigureAwait(false);
+            await _stream.FlushAsync().ConfigureAwait(false);
+        }
+
         public async Task Receive(params string[] lines)
         {
             var expected = string.Join("\r\n", lines);

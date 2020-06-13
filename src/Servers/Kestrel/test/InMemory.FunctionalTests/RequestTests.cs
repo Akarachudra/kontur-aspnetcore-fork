@@ -253,6 +253,54 @@ namespace Microsoft.AspNetCore.Server.Kestrel.InMemory.FunctionalTests
             }
         }
 
+        [Theory]
+        [InlineData("/path/кириллица/test?q=abc", "/path/кириллица/test", "abc")]
+        [InlineData("/path?q=тест", "/path", "тест")]
+        public async Task CanHandleCyrillicRequests(string requestUrl, string expectedPath, string queryValue)
+        {
+            var pathTcs = new TaskCompletionSource<PathString>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var rawTargetTcs = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var queryTcs = new TaskCompletionSource<IQueryCollection>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+            await using (var server = new TestServer(async context =>
+            {
+                pathTcs.TrySetResult(context.Request.Path);
+                queryTcs.TrySetResult(context.Request.Query);
+                rawTargetTcs.TrySetResult(context.Features.Get<IHttpRequestFeature>().RawTarget);
+                await context.Response.WriteAsync("Done");
+            }, new TestServiceContext(LoggerFactory)))
+            {
+                using (var connection = server.CreateConnection())
+                {
+                    await connection.SendWithUtf8(
+                        $"GET {requestUrl} HTTP/1.1",
+                        "Content-Length: 0",
+                        "Host: localhost",
+                        "",
+                        "");
+
+                    await connection.Receive($"HTTP/1.1 200 OK",
+                        $"Date: {server.Context.DateHeaderValue}",
+                        "Transfer-Encoding: chunked",
+                        "",
+                        "4",
+                        "Done");
+
+                    await Task.WhenAll(pathTcs.Task, rawTargetTcs.Task, queryTcs.Task).DefaultTimeout();
+                    Assert.Equal(new PathString(expectedPath), pathTcs.Task.Result);
+                    Assert.Equal(requestUrl, rawTargetTcs.Task.Result);
+                    if (queryValue == null)
+                    {
+                        Assert.False(queryTcs.Task.Result.ContainsKey("q"));
+                    }
+                    else
+                    {
+                        Assert.Equal(queryValue, queryTcs.Task.Result["q"]);
+                    }
+                }
+            }
+        }
+
         [Fact]
         public async Task CanHandleTwoAbsoluteFormRequestsInARow()
         {

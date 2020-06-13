@@ -130,7 +130,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure
             return asciiString;
         }
 
-        private static unsafe string GetAsciiOrUTF8StringNonNullCharacters(this Span<byte> span)
+        public static unsafe string GetAsciiOrUTF8StringNonNullCharacters(this Span<byte> span)
         {
             if (span.IsEmpty)
             {
