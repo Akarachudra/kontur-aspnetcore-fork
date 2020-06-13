@@ -1294,6 +1294,21 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http
         {
             Log.ConnectionBadRequest(ConnectionId, ex);
 
+            var headers = RequestHeaders != null && RequestHeaders.Count > 0
+                ? string.Join(", ", RequestHeaders.Keys.Select(k => k + ":" + (RequestHeaders[k])))
+                : string.Empty;
+
+            Log.LogInformation(
+                "Bad Request State. Connection id: '{ConnectionId}', http vertsion:'{HttpVersion}', method:'{Method}', from ip:'{LocalIpAddress}', port:'{LocalPort}', path:'{Path}', queryString:'{QueryString}', headers:'{headers}'",
+                ConnectionId,
+                HttpVersion,
+                Method,
+                LocalIpAddress,
+                LocalPort,
+                Path,
+                QueryString,
+                headers);
+
             if (!HasResponseStarted)
             {
                 SetErrorResponseException(ex);
