@@ -4033,7 +4033,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.InMemory.FunctionalTests
         [Theory]
         [InlineData("Referer", "http://контур.рф")]
         [InlineData("Cookie", "test=тест")]
-        [InlineData("Custom-Header", "кириллица")]
+        [InlineData("Custom-Header", "я кириллица")]
         public async Task ResponseShouldSupportCyrillicHeaderValues(string headerKey, string headerValue)
         {
             var flushed = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);

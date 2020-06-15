@@ -1980,7 +1980,6 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Tests
             {
                 await context.Response.WriteAsync("Hello World");
                 Assert.Throws<InvalidOperationException>(() => context.Response.AppendTrailer("Custom你好Name", "Custom Value"));
-                Assert.Throws<InvalidOperationException>(() => context.Response.AppendTrailer("CustomName", "Custom 你好 Value"));
             });
 
             await StartStreamAsync(1, _browserRequestHeaders, endStream: true);
