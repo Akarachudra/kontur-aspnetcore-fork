@@ -51,8 +51,8 @@ namespace Microsoft.AspNetCore.Server.Kestrel.InMemory.FunctionalTests
             };
 
             return TestSuccess(HttpProtocols.Http2,
-                Encoding.ASCII.GetString(Http2Connection.ClientPreface),
-                Encoding.ASCII.GetString(expected));
+                Encoding.GetEncoding("iso-8859-1").GetString(Http2Connection.ClientPreface),
+                Encoding.GetEncoding("iso-8859-1").GetString(expected));
         }
 
         private async Task TestSuccess(HttpProtocols serverProtocols, string request, string expectedResponse)

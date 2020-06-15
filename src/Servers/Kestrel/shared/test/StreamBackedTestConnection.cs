@@ -23,7 +23,7 @@ namespace Microsoft.AspNetCore.Testing
         protected StreamBackedTestConnection(Stream stream)
         {
             _stream = stream;
-            _reader = new StreamReader(_stream, Encoding.ASCII);
+            _reader = new StreamReader(_stream, Encoding.GetEncoding("iso-8859-1"));
         }
 
         public Stream Stream => _stream;
@@ -92,26 +92,12 @@ namespace Microsoft.AspNetCore.Testing
 
         public async Task SendWithUtf8(params string[] lines)
         {
-            var text = string.Join("\r\n", lines);
-            var utf8Bytes = Encoding.UTF8.GetBytes(text);
-            var utf8StringBuilder = new StringBuilder(utf8Bytes.Length);
-            foreach (var c in utf8Bytes)
+            for (var i = 0; i < lines.Length; i++)
             {
-                utf8StringBuilder.Append((char)c);
+                lines[i] = GetUtf8EncodedString(lines[i]);
             }
 
-            var utf8String = utf8StringBuilder.ToString();
-            var writer = new StreamWriter(_stream, Encoding.GetEncoding("iso-8859-1"));
-            for (var index = 0; index < utf8String.Length; index++)
-            {
-                var ch = utf8String[index];
-                writer.Write(ch);
-                await writer.FlushAsync().ConfigureAwait(false);
-                // Re-add delay to help find socket input consumption bugs more consistently
-                //await Task.Delay(TimeSpan.FromMilliseconds(5));
-            }
-            await writer.FlushAsync().ConfigureAwait(false);
-            await _stream.FlushAsync().ConfigureAwait(false);
+            await Send(lines).ConfigureAwait(false);
         }
 
         public async Task Receive(params string[] lines)
@@ -149,6 +135,16 @@ namespace Microsoft.AspNetCore.Testing
             Assert.Equal(expected, new string(actual, 0, offset));
         }
 
+        public async Task ReceiveWithUtf8(params string[] lines)
+        {
+            for (var i = 0; i < lines.Length; i++)
+            {
+                lines[i] = GetUtf8EncodedString(lines[i]);
+            }
+
+            await Receive(lines).ConfigureAwait(false);
+        }
+
         public async Task ReceiveEnd(params string[] lines)
         {
             await Receive(lines).ConfigureAwait(false);
@@ -168,6 +164,18 @@ namespace Microsoft.AspNetCore.Testing
                 throw new IOException(
                     $"Expected connection close, received data instead: \"{_reader.CurrentEncoding.GetString(buffer, 0, bytesTransferred)}\"");
             }
+        }
+
+        private static string GetUtf8EncodedString(string s)
+        {
+            var utf8Bytes = Encoding.UTF8.GetBytes(s);
+            var utf8StringBuilder = new StringBuilder(utf8Bytes.Length);
+            foreach (var c in utf8Bytes)
+            {
+                utf8StringBuilder.Append((char)c);
+            }
+
+            return utf8StringBuilder.ToString();
         }
     }
 }
