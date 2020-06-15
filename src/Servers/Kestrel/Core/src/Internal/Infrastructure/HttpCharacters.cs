@@ -185,12 +185,11 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int IndexOfInvalidFieldValueChar(string s)
         {
-            var fieldValue = _fieldValue;
-
             for (var i = 0; i < s.Length; i++)
             {
                 var c = s[i];
-                if (c >= (uint)fieldValue.Length || !fieldValue[c])
+                // Controls and DEL characters are invalid
+                if (c < 0x20 || c == 0x7F)
                 {
                     return i;
                 }
