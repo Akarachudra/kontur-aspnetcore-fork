@@ -151,7 +151,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.InMemory.FunctionalTests
         }
 
         [Fact]
-        public async Task BadRequestLogsAreNotHigherThanDebug()
+        public async Task BadRequestLogsAreNotHigherThanInformation()
         {
             await using (var server = new TestServer(async context =>
             {
@@ -168,7 +168,10 @@ namespace Microsoft.AspNetCore.Server.Kestrel.InMemory.FunctionalTests
                 }
             }
 
-            Assert.All(TestSink.Writes, w => Assert.InRange(w.LogLevel, LogLevel.Trace, LogLevel.Debug));
+            // Should contain 1 info message and 1 stacktrace message
+            Assert.Equal(2, TestSink.Writes.Count(w => w.LogLevel == LogLevel.Information));
+            var withoutInformationLogs = TestSink.Writes.Where(w => w.LogLevel != LogLevel.Information).ToList();
+            Assert.All(withoutInformationLogs, w => Assert.InRange(w.LogLevel, LogLevel.Trace, LogLevel.Debug));
             Assert.Contains(TestSink.Writes, w => w.EventId.Id == 17);
         }
 
