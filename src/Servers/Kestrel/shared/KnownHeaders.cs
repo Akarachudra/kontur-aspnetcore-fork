@@ -692,8 +692,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http
         }}
 
         protected override void SetValueFast(string key, StringValues value)
-        {{{(loop.ClassName != "HttpRequestHeaders" ? @"
-            ValidateHeaderValueCharacters(value);" : "")}
+        {{
             switch (key.Length)
             {{{Each(loop.HeadersByLength, byLength => $@"
                 case {byLength.Key}:
@@ -723,8 +722,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http
         }}
 
         protected override bool AddValueFast(string key, StringValues value)
-        {{{(loop.ClassName != "HttpRequestHeaders" ? @"
-            ValidateHeaderValueCharacters(value);" : "")}
+        {{
             switch (key.Length)
             {{{Each(loop.HeadersByLength, byLength => $@"
                 case {byLength.Key}:
@@ -1055,7 +1053,8 @@ $@"        private void Clear(long bitsToClear)
             }}
         }}
     }}
-")}}}";
+")}}}
+";
         }
     }
 }
