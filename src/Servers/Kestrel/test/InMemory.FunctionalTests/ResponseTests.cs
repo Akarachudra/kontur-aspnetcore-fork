@@ -4030,6 +4030,40 @@ namespace Microsoft.AspNetCore.Server.Kestrel.InMemory.FunctionalTests
             }
         }
 
+        [Theory]
+        [InlineData("Referer", "http://контур.рф")]
+        [InlineData("Cookie", "test=тест")]
+        [InlineData("Custom-Header", "кириллица")]
+        public async Task ResponseShouldSupportCyrillicHeaderValues(string headerKey, string headerValue)
+        {
+            var flushed = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+            await using (var server = new TestServer(async httpContext =>
+            {
+                httpContext.Response.Headers[headerKey] = headerValue;
+                await httpContext.Response.WriteAsync("test");
+                await flushed.Task;
+            }, new TestServiceContext(LoggerFactory)))
+            {
+                using (var connection = server.CreateConnection())
+                {
+                    await connection.Send(
+                        "HEAD / HTTP/1.1",
+                        "Host:",
+                        "",
+                        "");
+                    await connection.ReceiveWithUtf8(
+                        "HTTP/1.1 200 OK",
+                        $"Date: {server.Context.DateHeaderValue}",
+                        $"{headerKey}: {headerValue}",
+                        "",
+                        "");
+
+                    flushed.SetResult(null);
+                }
+            }
+        }
+
         private static async Task ResponseStatusCodeSetBeforeHttpContextDispose(
             ITestSink testSink,
             ILoggerFactory loggerFactory,

@@ -4,8 +4,10 @@
 using System;
 using System.Buffers;
 using System.IO.Pipelines;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace System.Buffers
 {
@@ -44,6 +46,12 @@ namespace System.Buffers
         {
             if (string.IsNullOrEmpty(data))
             {
+                return;
+            }
+
+            if (ContainsNonAscii(data))
+            {
+                buffer.Write(Encoding.UTF8.GetBytes(data));
                 return;
             }
 
@@ -267,6 +275,11 @@ namespace System.Buffers
             var bytes = new byte[_maxULongByteLength];
             _numericBytesScratch = bytes;
             return bytes;
+        }
+
+        private static bool ContainsNonAscii(string s)
+        {
+            return s.Any(c => (c & 0xFF80) != 0);
         }
     }
 }
