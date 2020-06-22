@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -13,7 +13,6 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure
         private static readonly bool[] _authority = InitializeAuthority();
         private static readonly bool[] _token = InitializeToken();
         private static readonly bool[] _host = InitializeHost();
-        private static readonly bool[] _fieldValue = InitializeFieldValue();
 
         internal static void Initialize()
         {
@@ -101,17 +100,6 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure
             host['_'] = true;
             host['~'] = true;
             return host;
-        }
-
-        private static bool[] InitializeFieldValue()
-        {
-            // field-value https://tools.ietf.org/html/rfc7230#section-3.2
-            var fieldValue = new bool[_tableSize];
-            for (var c = 0x20; c <= 0x7e; c++) // VCHAR and SP
-            {
-                fieldValue[c] = true;
-            }
-            return fieldValue;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
