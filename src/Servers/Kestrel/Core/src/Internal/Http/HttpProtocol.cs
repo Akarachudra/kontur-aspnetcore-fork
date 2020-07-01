@@ -1299,7 +1299,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http
                 : string.Empty;
 
             Log.LogInformation(
-                "Bad Request State. Connection id: '{ConnectionId}', http vertsion:'{HttpVersion}', method:'{Method}', from ip:'{LocalIpAddress}', port:'{LocalPort}', path:'{Path}', queryString:'{QueryString}', headers:'{headers}'",
+                "Bad Request State. Connection id: '{ConnectionId}', http version:'{HttpVersion}', method:'{Method}', from ip:'{LocalIpAddress}', port:'{LocalPort}', path:'{Path}', queryString:'{QueryString}', headers:'{headers}'",
                 ConnectionId,
                 HttpVersion,
                 Method,
