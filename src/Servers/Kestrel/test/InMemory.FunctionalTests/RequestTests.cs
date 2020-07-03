@@ -301,6 +301,35 @@ namespace Microsoft.AspNetCore.Server.Kestrel.InMemory.FunctionalTests
             }
         }
 
+        [Theory]
+        [InlineData("User-Agent", "DiadocClient v5.29.3.538 1Ñ:ERP Óïðàâëåíèå ïðåäïðèÿòèåì 2 (2.4.12.71) extention: extention is not possible")]
+        public async Task SupportInvalidEncodedUtf8Headers(string headerKey, string headerValue)
+        {
+            await using (var server = new TestServer(async context =>
+            {
+                await context.Response.WriteAsync("Done");
+            }, new TestServiceContext(LoggerFactory)))
+            {
+                using (var connection = server.CreateConnection())
+                {
+                    await connection.Send(
+                        "GET / HTTP/1.1",
+                        "Content-Length: 0",
+                        "Host: localhost",
+                        $"{headerKey}: {headerValue}",
+                        "",
+                        "");
+
+                    await connection.Receive($"HTTP/1.1 200 OK",
+                        $"Date: {server.Context.DateHeaderValue}",
+                        "Transfer-Encoding: chunked",
+                        "",
+                        "4",
+                        "Done");
+                }
+            }
+        }
+
         [Fact]
         public async Task CanHandleTwoAbsoluteFormRequestsInARow()
         {

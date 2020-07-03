@@ -28,7 +28,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure
         private const ulong _http10VersionLong = 3471766442030158920; // GetAsciiStringAsLong("HTTP/1.0"); const results in better codegen
         private const ulong _http11VersionLong = 3543824036068086856; // GetAsciiStringAsLong("HTTP/1.1"); const results in better codegen
 
-        private static readonly UTF8EncodingSealed HeaderValueEncoding = new UTF8EncodingSealed();
+        private static readonly UTF8NoValidationEncodingSealed HeaderValueEncoding = new UTF8NoValidationEncodingSealed();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void SetKnownMethod(ulong mask, ulong knownMethodUlong, HttpMethod knownMethod, int length)
@@ -592,6 +592,13 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure
         private sealed class UTF8EncodingSealed : UTF8Encoding
         {
             public UTF8EncodingSealed() : base(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true) { }
+
+            public override byte[] GetPreamble() => Array.Empty<byte>();
+        }
+
+        private sealed class UTF8NoValidationEncodingSealed : UTF8Encoding
+        {
+            public UTF8NoValidationEncodingSealed() : base(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: false) { }
 
             public override byte[] GetPreamble() => Array.Empty<byte>();
         }
